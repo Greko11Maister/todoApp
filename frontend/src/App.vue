@@ -47,7 +47,7 @@ export default {
   },
   watch: {
     todos: function(todos) {
-      window.backend.saveList(JSON.stringify(todos, null, 2));
+      window.backend.Todos.SaveList(JSON.stringify(todos, null, 2));
     },
     deep: true
   },
@@ -59,18 +59,24 @@ export default {
     }
   },
   mounted() {
-    window.backend.loadList().then((list) => {
-      try {
-        this.todos = JSON.parse(list);
-      } catch (e) {
-        
-        Wails.Log.Info("An error was thrown: " + e.message);
-        this.errorMessage = "Unable to load todo list";
+    window.backend.Todos
+      .LoadList()
+      .then(list => {
+        try {
+          this.todos = JSON.parse(list);
+        } catch (e) {
+          this.errorMessage = "Unable to load todo list";
+          setTimeout(() => {
+            this.errorMessage = "";
+          }, 3000);
+        }
+      })
+      .catch(error => {
+        this.errorMessage = error;
         setTimeout(() => {
           this.errorMessage = "";
         }, 3000);
-      }
-    });
+      });
   },
   methods: {
     addTodo: function() {
